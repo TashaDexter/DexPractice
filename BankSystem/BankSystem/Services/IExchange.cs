@@ -4,6 +4,6 @@ namespace BankSystem.Services
 {
     public interface IExchange
     {
-        double ExchangeCurrency<T, U>(T currencyIn, U currencyOut, double ammount) where T : Currency where U : Currency;
+        double ExchangeCurrency<T, U>(double ammount, T currencyIn, U currencyOut) where T : Currency where U : Currency;
     }
 }

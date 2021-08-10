@@ -22,7 +22,7 @@ namespace BankSystem
             while (number < clientNumber)
             {
                 Client client = new Client() { PassportID= rnd.Next(1000, 9999), Age=rnd.Next(18,50), FirstName=firstNames[rnd.Next(0,4)], LastName=lastNames[rnd.Next(0,4)] };
-                bankService1.Clients.Add(client);
+                bankService1.AddClient(client);
                 number++;
             }
 
@@ -40,7 +40,7 @@ namespace BankSystem
             while (number < employeeNumber)
             {
                 Employee employee = new Employee() { PassportID = rnd.Next(1000, 9999), Age = rnd.Next(18, 50), FirstName = firstNames[rnd.Next(0, 4)], LastName = lastNames[rnd.Next(0, 4)] };
-                bankService1.Employees.Add(employee);
+                bankService1.AddEmployee(employee);
                 number++;
             }
 
@@ -64,6 +64,12 @@ namespace BankSystem
                       $"Age={person.Age}, " +
                       $"PersonType={ person.GetType()}");
             }
+            else
+            {
+                Console.WriteLine($"Person with passportID={passportID} was not found.");
+            }
+
+            Console.WriteLine("----------------------------------------------");
 
             Ruble ruble = new Ruble() { ValueInDollars = 0.014 };
             Euro euro = new Euro() { ValueInDollars = 1.19 };
@@ -71,61 +77,28 @@ namespace BankSystem
 
             Exchange exchange1 = new Exchange();
 
-            Console.WriteLine("\nEnter currency to exchange:\n(ruble/dollar/euro)");
-            string currencyIn = Console.ReadLine();
-            Console.WriteLine("\nEnter currency to receive:\n(ruble/dollar/euro)");
-            string currencyOut = Console.ReadLine();
-            Console.WriteLine("\nEnter ammount to exchange:");
-            double ammount = Convert.ToDouble(Console.ReadLine());
+            Client client1 = new Client() { PassportID = 26125, Age = 15, FirstName = "Kane", LastName = "Bounty", Status = "VIP" };
+            Account acc1 = new Account() { Currency = ruble, Ammount = 278.5 };
+            Account acc2 = new Account() { Currency = dollar, Ammount = 29.8 };
 
-            Currency curIn=null;
-            switch (currencyIn)
-            {
-                case "ruble":
-                    {
-                        curIn = ruble;
-                        break;
-                    }
-                case "dollar":
-                    {
-                        curIn = dollar;
-                        break;
-                    }
-                case "euro":
-                    {
-                        curIn = euro;
-                        break;
-                    }
-                default:
-                    break;
-            }
+            bankService1.AddClientAccount(client1, acc1);
 
-            Currency curOut=null;
-            switch (currencyOut)
-            {
-                case "ruble":
-                    {
-                        curOut = ruble;
-                        break;
-                    }
-                case "dollar":
-                    {
-                        curOut = dollar;
-                        break;
-                    }
-                case "euro":
-                    {
-                        curOut = euro;
-                        break;
-                    }
-                default:
-                    break;
-            }
-            if (curIn == null || curOut == null)
-                Console.WriteLine("Error! The entered data is incorrect.");
-            else
-                Console.WriteLine($"\n{ammount} {currencyIn} = {exchange1.ExchangeCurrency(curIn, curOut, ammount)} {currencyOut}");
-            
+            Console.WriteLine("\n-------------Before money transfer------------\n");
+            Console.WriteLine($"Account1 ammount={acc1.Ammount}");
+            Console.WriteLine($"Account2 ammount={acc2.Ammount}");
+
+            var exchHandler = new Func<double, Currency, Currency, double>(exchange1.ExchangeCurrency);
+
+            Console.WriteLine("\n---------------Money transfer #1---------------\n");
+            bankService1.MoneyTransfer(18, acc1, acc2, exchHandler);
+            Console.WriteLine($"Account1 ammount={acc1.Ammount}");
+            Console.WriteLine($"Account2 ammount={acc2.Ammount}");
+
+            Console.WriteLine("\n---------------Money transfer #2---------------\n");
+            bankService1.MoneyTransfer(270, acc1, acc2, exchHandler);
+            Console.WriteLine($"Account1 ammount={acc1.Ammount}");
+            Console.WriteLine($"Account2 ammount={acc2.Ammount}");
+
             Console.ReadKey();
         }
     }

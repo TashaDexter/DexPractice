@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\MinorAgeException.cs" />
+    <Compile Include="Exceptions\NotEnoughFundsException.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\Currency.cs" />
     <Compile Include="Models\Dollar.cs" />
@@ -52,6 +54,7 @@
     <Compile Include="Models\Ruble.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Account.cs" />
     <Compile Include="Services\BankService.cs" />
     <Compile Include="Services\Exchange.cs" />
     <Compile Include="Services\IExchange.cs" />
