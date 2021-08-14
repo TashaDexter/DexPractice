@@ -20,8 +20,6 @@
             return client.PassportID == PassportID;
         }
 
-        public string Status { get; set; }
-
         public static bool operator ==(Client client1, Client client2)
         {
             return client1.Equals(client2);
@@ -34,7 +32,7 @@
 
         public override int GetHashCode()
         {
-            return PassportID + FirstName.Length + LastName.Length+Age + Status.Length;
+            return PassportID + FirstName.Length + LastName.Length+Age;
         }
     }
 }
