@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace BankSystem.Services
 {
@@ -11,13 +12,13 @@ namespace BankSystem.Services
     {
         private List<Client> _clients;
         private List<Employee> _employees;
-        private Dictionary<Client, List<Account>> _clientAccounts;
+        private Dictionary<int, List<Account>> _clientAccounts;
         public Func<Currency, Currency, double, double> ExchangeHandler;
         public BankService()
         {
             Clients=new List<Client>();
             Employees = new List<Employee>();
-            _clientAccounts = new Dictionary<Client, List<Account>>();
+            _clientAccounts = new Dictionary<int, List<Account>>();
         }
         public List<Client> Clients
         {
@@ -67,7 +68,6 @@ namespace BankSystem.Services
 
                 {
                     _clients.Add(client);
-
                     //создание пути в bin/Debug/Clients/
                     string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
                     DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
@@ -77,34 +77,12 @@ namespace BankSystem.Services
                         directoryInfo.Create();
                     }
 
-                    //счетчик для проверки повторяющихся клиентов в файле
-                    int counter = 0;
-                    //проверка, существует ли клиент с заданным passportID в файле
-                    using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.OpenOrCreate))
+                    if (!FileHasClient(pathClients, client))
                     {
-                        byte[] arrayReadClients = new byte[fsClients.Length];
-                        fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
-                        string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
-                        string[] lines = clientsText.Split('\n');
-                        
-                        foreach (var l in lines)
-                        {
-                            string[] words = l.Split(' ');
-                            if (words[0] == client.PassportID.ToString())
-                            {
-                                Console.WriteLine($"Error! Client with passportID={words[0]} exists!");
-                                counter++;
-                            }
-                        }  
-                    }
-                    //если клиента в файле нет (то есть счетчик равен нулю), то дописать в файл с новой строки
-                    if (counter == 0)
-                    {
-                        string clientText = client.PassportID + " " + client.FirstName + ' ' + client.LastName + ' ' + client.Age ;
-
+                        var serClient = JsonConvert.SerializeObject(client);
                         using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.Append))
                         {
-                            byte[] arrayClients = System.Text.Encoding.Default.GetBytes(clientText + "\n");
+                            byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClient + "\n");
                             fsClients.Write(arrayClients, 0, arrayClients.Length);
                             fsClients.Close();
                         }
@@ -114,6 +92,32 @@ namespace BankSystem.Services
             catch (MinorAgeException e)
             {
                 Console.WriteLine(e.Message);
+            }
+        }
+
+        private bool FileHasClient(string path, Client client)
+        {
+            int counter = 0;
+            using (FileStream fsClients = new FileStream($"{path}\\Clients.txt", FileMode.OpenOrCreate))
+            {
+                byte[] arrayReadClients = new byte[fsClients.Length];
+                fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
+                string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
+                string[] lines = clientsText.Split('\n');
+
+                foreach (var l in lines)
+                {
+                    string[] words = l.Split(' ');
+                    if (words[0] == client.PassportID.ToString())
+                    {
+                        Console.WriteLine($"Error! Client with passportID={words[0]} exists!");
+                        counter++;
+                    }
+                }
+                if (counter > 0)
+                    return true;
+                else
+                    return false;
             }
         }
 
@@ -128,43 +132,21 @@ namespace BankSystem.Services
                     _employees.Add(employee);
 
                     //создание пути в bin/Debug/Employees
-                    string pathEmployee = Directory.GetCurrentDirectory() + "\\Employees";
-                    DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployee);
+                    string pathEmployees = Directory.GetCurrentDirectory() + "\\Employees";
+                    DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployees);
 
                     if (!directoryInfo.Exists)
                     {
                         directoryInfo.Create();
                     }
 
-                    //счетчик для проверки повторяющихся сотрудников в файле
-                    int counter = 0;
-                    //проверка, существует ли сотрудник с заданным passportID в файле
-                    using (FileStream fsEmployee = new FileStream($"{pathEmployee}\\Employees.txt", FileMode.OpenOrCreate))
+                    if (!FileHasEmployee(pathEmployees, employee))
                     {
-                        byte[] arrayReadEmployees = new byte[fsEmployee.Length];
-                        fsEmployee.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
-                        string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
-                        string[] lines = employeesText.Split('\n');
-
-                        foreach (var l in lines)
+                        var serClient = JsonConvert.SerializeObject(employee);
+                        using (FileStream fsClients = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.Append))
                         {
-                            string[] words = l.Split(' ');
-                            if (words[0] == employee.PassportID.ToString())
-                            {
-                                Console.WriteLine($"Error! Employee with passportID={words[0]} exists!");
-                                counter++;
-                            }
-                        }
-                    }
-                    //если сотрудника в файле нет (то есть счетчик равен нулю), то дописать в файл с новой строки
-                    if (counter == 0)
-                    {
-                        string employeeText = employee.PassportID + " " + employee.FirstName + " " + employee.LastName + " " + employee.Age + " " + employee.Position;
-
-                        using (FileStream fsClients = new FileStream($"{pathEmployee}\\Employees.txt", FileMode.Append))
-                        {
-                            byte[] arrayEmployees = System.Text.Encoding.Default.GetBytes(employeeText + "\n");
-                            fsClients.Write(arrayEmployees, 0, arrayEmployees.Length);
+                            byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClient + "\n");
+                            fsClients.Write(arrayClients, 0, arrayClients.Length);
                             fsClients.Close();
                         }
                     }
@@ -176,18 +158,45 @@ namespace BankSystem.Services
             }
         }
 
+        private bool FileHasEmployee(string path, Employee employee)
+        {
+            int counter = 0;
+            using (FileStream fsEmployees = new FileStream($"{path}\\Employees.txt", FileMode.OpenOrCreate))
+            {
+                byte[] arrayReadEmployees = new byte[fsEmployees.Length];
+                fsEmployees.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
+                string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
+                string[] lines = employeesText.Split('\n');
+
+                foreach (var l in lines)
+                {
+                    string[] words = l.Split(' ');
+                    if (words[0] == employee.PassportID.ToString())
+                    {
+                        Console.WriteLine($"Error! Employee with passportID={words[0]} exists!");
+                        counter++;
+                    }
+                }
+                if (counter > 0)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
         public IPerson Find<T>(int passportID) where T : IPerson
         {
+            //поиск из файла
             return FindFromFile<T>(passportID);
             
-            //закомментировала для проверки поиска из файла
-            /*var client=FindPerson(Clients, passportID);
+            //поиск через списки
+            var client=FindPerson(Clients, passportID);
             var employee = FindPerson(Employees, passportID);
             if (client != null)
                 return client;
             if (employee != null)
                 return employee;
-            return null;*/
+            return null;
         }
 
         private IPerson FindPerson<U>(List<U> list, int passportID) where U : IPerson
@@ -203,7 +212,18 @@ namespace BankSystem.Services
             return null;
         }
 
-        private IPerson FindFromFile<T>(int passportID) where T:IPerson
+        private IPerson FindFromFile<T>(int passportID) where T : IPerson
+        {
+            var client = FindClientFromFile(passportID);
+            var employee = FindEmployeeFromFile(passportID);
+            if (!(client is null))
+                return client;
+            if (!(employee is null))
+                return employee;
+            return null;
+        }
+
+        private Client FindClientFromFile(int passportID)
         {
             string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
             DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
@@ -212,57 +232,57 @@ namespace BankSystem.Services
             {
                 Console.WriteLine("Directory doesn't exist!");
             }
-
-            using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.OpenOrCreate))
-            {
-                byte[] arrayReadClients = new byte[fsClients.Length];
-                fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
-                string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
-                string[] lines = clientsText.Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (var l in lines)
+            else
+                using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.OpenOrCreate))
                 {
-                    if (l != "")
+                    byte[] arrayReadClients = new byte[fsClients.Length];
+                    fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
+                    string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
+
+                    string[] clientsFromFile = clientsText.Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string cl in clientsFromFile)
                     {
-                        string[] words = l.Split(' ');
-                        int passID = Convert.ToInt32(words[0]);
-                        string firstName = words[1];
-                        string lastName = words[2];
-                        int age = Convert.ToInt32(words[3]);
-                        if (passID == passportID)
-                            return new Client() { PassportID = passID, FirstName = firstName, LastName = lastName, Age = age };
+                        if (cl != "")
+                        {
+                            Client client = JsonConvert.DeserializeObject<Client>(cl);
+                            if (client.PassportID == passportID)
+                                return client;
+                        }
                     }
                 }
-            }
+            return null;
+        }
 
+        private Employee FindEmployeeFromFile(int passportID)
+        {
             string pathEmployees = Directory.GetCurrentDirectory() + "\\Employees";
-           directoryInfo = new DirectoryInfo(pathClients);
+            DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployees);
 
             if (!directoryInfo.Exists)
             {
                 Console.WriteLine("Directory doesn't exist!");
             }
-
-            using (FileStream fsEmployees = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.OpenOrCreate))
+            else
             {
-                byte[] arrayReadEmployees = new byte[fsEmployees.Length];
-                fsEmployees.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
-                string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
-                string[] lines =employeesText.Split('\n');
-
-                foreach (var l in lines)
+                using (FileStream fsEmployees = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.OpenOrCreate))
                 {
-                    string[] words = l.Split(' ');
-                    int passID = Convert.ToInt32(words[0]);
-                    string firstName = words[1];
-                    string lastName = words[2];
-                    int age = Convert.ToInt32(words[3]);
-                    if (passID == passportID)
-                        return new Employee() { PassportID = passID, FirstName = firstName, LastName = lastName, Age = age };
+                    byte[] arrayReadEmployees = new byte[fsEmployees.Length];
+                    fsEmployees.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
+                    string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
+
+                    string[] employeeFromFile = employeesText.Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string emp in employeeFromFile)
+                    {
+                        if (emp != "")
+                        {
+                            Employee employee = JsonConvert.DeserializeObject<Employee>(emp);
+                            if (employee.PassportID == passportID)
+                                return employee;
+                        }
+                    }
                 }
             }
             return null;
-
         }
 
         public void AddClientAccount(Client client, Account account)
@@ -276,125 +296,49 @@ namespace BankSystem.Services
                 directoryInfo.Create();
             }
 
-            using (FileStream fsClientAccounts = new FileStream($"{pathDictionary}\\ClientAccounts.txt", FileMode.OpenOrCreate))
-            {
-                //получить словарь из текста
-                byte[] arrayReadClientAccounts = new byte[fsClientAccounts.Length];
-                fsClientAccounts.Read(arrayReadClientAccounts, 0, arrayReadClientAccounts.Length);
-                string clientAccountsText = System.Text.Encoding.Default.GetString(arrayReadClientAccounts);
-                var dictionary=GetDictionaryFromText(clientAccountsText);
-            }
+            AppendToDictionaryFromFile(pathDictionary);
 
-            if (Clients.Contains(client))
+            if (!Clients.Contains(client))
+                AddClient(client);
+
+            if (!_clientAccounts.ContainsKey(client.PassportID))
             {
-                if (!_clientAccounts.ContainsKey(client))
-                {
-                    _clientAccounts.Add(client, new List<Account> { account });
-                }
-                else
-                {
-                    _clientAccounts[client].Add(account);
-                }
+                _clientAccounts.Add(client.PassportID, new List<Account> { account });
             }
             else
             {
-                AddClient(client);
-                if (!_clientAccounts.ContainsKey(client))
-                {
-                    _clientAccounts.Add(client, new List<Account> { account });
-                }
-                else
-                {
-                    _clientAccounts[client].Add(account);
-                }
+                _clientAccounts[client.PassportID].Add(account);
             }
 
-            var text = GetTextFromDictionary(_clientAccounts);
+            RewriteDictionary(pathDictionary);
+        }
+
+        //ДОПИСЫВАЕТ (!не перезаписывает) данные из файла в словарь
+        private void AppendToDictionaryFromFile(string pathDictionary)
+        {
+            using (FileStream fsClientAccounts = new FileStream($"{ pathDictionary}\\ClientAccounts.txt", FileMode.OpenOrCreate))
+            {
+                byte[] arrayClientAccounts = new byte[fsClientAccounts.Length];
+                fsClientAccounts.Read(arrayClientAccounts, 0, arrayClientAccounts.Length);
+                string clientAccountsText = System.Text.Encoding.Default.GetString(arrayClientAccounts);
+
+                var dictionary = JsonConvert.DeserializeObject<Dictionary<int, List<Account>>>(clientAccountsText);
+                foreach (var dict in dictionary)
+                {
+                    if (!_clientAccounts.ContainsKey(dict.Key))
+                        _clientAccounts.Add(dict.Key, dict.Value);
+                }
+            }
+        }
+
+        private void RewriteDictionary(string pathDictionary)
+        {
+            var textClientAccount = JsonConvert.SerializeObject(_clientAccounts);
             using (FileStream fsClientAccounts = new FileStream($"{pathDictionary}\\ClientAccounts.txt", FileMode.Create))
             {
-                byte[] arrayText = System.Text.Encoding.Default.GetBytes(text);
+                byte[] arrayText = System.Text.Encoding.Default.GetBytes(textClientAccount);
                 fsClientAccounts.Write(arrayText, 0, arrayText.Length);
             }
-        }
-
-        public Dictionary<Client, List<Account>> GetDictionaryFromText(string text)
-        {
-            Dictionary<Client, List<Account>> dictionary = new Dictionary<Client, List<Account>>();
-            var separator = "\n---\n";
-            string[] pairKeyValue = text.Split(separator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            foreach (var pair in pairKeyValue)
-            {
-                string[] lines = pair.Trim().Split(':');
-
-                string key = lines[0];
-                //values - строка, которая включает в себя все аккаунты одной строкой
-                string values = lines[1];
-                //value - аккаунты, разбитые на строки через разделитель ';'
-                string[] value = values.Trim().Split(';', (char)StringSplitOptions.RemoveEmptyEntries);
-
-                string[] paramsClient = key.Split(' ');
-                int passportID = Convert.ToInt32(paramsClient[0]);
-                string firstName = paramsClient[1];
-                string lastName = paramsClient[2];
-                int age = Convert.ToInt32(paramsClient[3]);
-                Client client = new Client() { PassportID = passportID, FirstName = firstName, LastName = lastName, Age = age };
-
-                List<Account> accounts = new List<Account>();
-
-                foreach (var v in value)
-                {
-                    if (v != "")
-                    {
-                        string[] paramsAccount = v.Trim(' ').Split(' ');
-                        double ammount = Convert.ToDouble(paramsAccount[0]);
-                        string type = paramsAccount[1];
-                        double valueInDollars = Convert.ToDouble(paramsAccount[2]);
-                        Currency currency = null;
-                        switch (type)
-                        {
-                            case "RUB":
-                                {
-                                    currency = new Ruble() { Type = type, ValueInDollars = valueInDollars };
-                                    break;
-                                }
-                            case "EUR":
-                                {
-                                    currency = new Euro() { Type = type, ValueInDollars = valueInDollars };
-                                    break;
-                                }
-                            case "USD":
-                                {
-                                    currency = new Dollar() { Type = type, ValueInDollars = valueInDollars };
-                                    break;
-                                }
-                        }
-                        accounts.Add(new Account() { Ammount = ammount, Currency = currency });
-                    }
-                }
-
-                if(!dictionary.ContainsKey(client))
-                    dictionary.Add(client, accounts);
-            }
-
-            return dictionary;
-        }
-
-        public string GetTextFromDictionary(Dictionary<Client, List<Account>> dictionary)
-        {
-            string text="";
-            var separator = "\n---\n";
-
-            foreach (var dict in dictionary)
-            {
-                Client client = dict.Key;
-                List<Account> accounts = dict.Value;
-                var keyText = client.PassportID + " " + client.FirstName + " " + client.LastName + " " + client.Age;
-                var valueText = "";
-                foreach (var account in accounts)
-                    valueText+=account.Ammount + " " + account.Currency.Type + " " + account.Currency.ValueInDollars+" ; ";
-                text += keyText + " : " + valueText + separator;
-            }
-            return text;
         }
 
         public void MoneyTransfer(double ammount, Account donorAccount, Account recipientAccount, Func<double, Currency, Currency, double> exchangeHandler)
