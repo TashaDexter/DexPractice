@@ -13,21 +13,16 @@ namespace BankSystem
             BankService bankService1 = new BankService();
             Console.WriteLine("---------------BankService---------------");
 
+            var generator = new BogusGenerator();
+
             //тестовое добавление клиентов
-            var clientGen = new Faker<Client>()
-                .StrictMode(true)
-                .RuleFor(x => x.PassportID, f => f.Random.Int(1000, 9999))
-                .RuleFor(x => x.FirstName, f => f.Name.FirstName())
-                .RuleFor(x => x.LastName, f => f.Name.LastName())
-                .RuleFor(x => x.Age, f => f.Random.Int(19, 50));
-            
             Console.WriteLine("\nHow many clients do you want to add?");
             int clientNumber = Convert.ToInt32(Console.ReadLine());
             int number = 0;
             Random rnd = new Random();
             while (number < clientNumber)
             {
-                Client client = clientGen.Generate();
+                Client client =generator.GenerateClient();
                 bankService1.Add(client);
                 number++;
             }
@@ -41,19 +36,12 @@ namespace BankSystem
             }
 
             //тестовое добавление сотрудников
-            var employeeGen = new Faker<Employee>()
-                .StrictMode(true)
-                .RuleFor(x => x.PassportID, f => f.Random.Int(1000, 9999))
-                .RuleFor(x => x.FirstName, f => f.Name.FirstName())
-                .RuleFor(x => x.LastName, f => f.Name.LastName())
-                .RuleFor(x => x.Age, f => f.Random.Int(19, 50));
-
             Console.WriteLine("\nHow many employees do you want to add?");
             int employeeNumber = Convert.ToInt32(Console.ReadLine());
             number = 0;
             while (number < employeeNumber)
             {
-                Employee employee = employeeGen.Generate();
+                Employee employee = generator.GenerateEmployee();
                 bankService1.Add(employee);
                 number++;
             }
@@ -94,11 +82,11 @@ namespace BankSystem
 
             Exchange exchange1 = new Exchange();
 
-            Client client1 = clientGen.Generate();
+            Client client1 = generator.GenerateClient();
             Account acc1 = new Account() { Currency = ruble, Ammount = 278.5 };
             Account acc2 = new Account() { Currency = dollar, Ammount = 29.8 };
 
-            Client client2 = clientGen.Generate();
+            Client client2 = generator.GenerateClient();
             Account acc3 = new Account() { Currency = ruble, Ammount = 1578 };
             Account acc4 = new Account() { Currency = euro, Ammount = 4824 };
                         

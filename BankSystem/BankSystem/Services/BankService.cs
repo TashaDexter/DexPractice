@@ -323,11 +323,12 @@ namespace BankSystem.Services
                 string clientAccountsText = System.Text.Encoding.Default.GetString(arrayClientAccounts);
 
                 var dictionary = JsonConvert.DeserializeObject<Dictionary<int, List<Account>>>(clientAccountsText);
-                foreach (var dict in dictionary)
-                {
-                    if (!_clientAccounts.ContainsKey(dict.Key))
-                        _clientAccounts.Add(dict.Key, dict.Value);
-                }
+                if(!(dictionary is null))
+                    foreach (var dict in dictionary)
+                    {
+                        if (!_clientAccounts.ContainsKey(dict.Key))
+                            _clientAccounts.Add(dict.Key, dict.Value);
+                    }
             }
         }
 
