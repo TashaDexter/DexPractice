@@ -2,7 +2,6 @@
 using BankSystem.Services;
 using System;
 using System.Collections.Generic;
-using Bogus;
 
 namespace BankSystem
 {
@@ -13,7 +12,7 @@ namespace BankSystem
             BankService bankService1 = new BankService();
             Console.WriteLine("---------------BankService---------------");
 
-            var generator = new BogusGenerator();
+            var generator = new FakeDataService();
 
             //тестовое добавление клиентов
             Console.WriteLine("\nHow many clients do you want to add?");

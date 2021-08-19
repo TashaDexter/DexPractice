@@ -8,7 +8,7 @@ using Bogus;
 
 namespace BankSystem.Services
 {
-    public class BogusGenerator
+    public class FakeDataService
     {
         public Client GenerateClient()
         {

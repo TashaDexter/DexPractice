@@ -68,6 +68,7 @@ namespace BankSystem.Services
 
                 {
                     _clients.Add(client);
+
                     //создание пути в bin/Debug/Clients/
                     string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
                     DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
@@ -77,47 +78,19 @@ namespace BankSystem.Services
                         directoryInfo.Create();
                     }
 
-                    if (!FileHasClient(pathClients, client))
+                    var serClients = JsonConvert.SerializeObject(_clients);
+
+                    using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.Create))
                     {
-                        var serClient = JsonConvert.SerializeObject(client);
-                        using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.Append))
-                        {
-                            byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClient + "\n");
-                            fsClients.Write(arrayClients, 0, arrayClients.Length);
-                            fsClients.Close();
-                        }
+                        byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClients);
+                        fsClients.Write(arrayClients, 0, arrayClients.Length);
+                        fsClients.Close();
                     }
                 }
             }
             catch (MinorAgeException e)
             {
                 Console.WriteLine(e.Message);
-            }
-        }
-
-        private bool FileHasClient(string path, Client client)
-        {
-            int counter = 0;
-            using (FileStream fsClients = new FileStream($"{path}\\Clients.txt", FileMode.OpenOrCreate))
-            {
-                byte[] arrayReadClients = new byte[fsClients.Length];
-                fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
-                string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
-                string[] lines = clientsText.Split('\n');
-
-                foreach (var l in lines)
-                {
-                    string[] words = l.Split(' ');
-                    if (words[0] == client.PassportID.ToString())
-                    {
-                        Console.WriteLine($"Error! Client with passportID={words[0]} exists!");
-                        counter++;
-                    }
-                }
-                if (counter > 0)
-                    return true;
-                else
-                    return false;
             }
         }
 
@@ -140,47 +113,19 @@ namespace BankSystem.Services
                         directoryInfo.Create();
                     }
 
-                    if (!FileHasEmployee(pathEmployees, employee))
+                    var serEmployees= JsonConvert.SerializeObject(_employees);
+
+                   using (FileStream fsClients = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.Create))
                     {
-                        var serClient = JsonConvert.SerializeObject(employee);
-                        using (FileStream fsClients = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.Append))
-                        {
-                            byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClient + "\n");
-                            fsClients.Write(arrayClients, 0, arrayClients.Length);
-                            fsClients.Close();
-                        }
+                        byte[] arrayEmployees = System.Text.Encoding.Default.GetBytes(serEmployees);
+                        fsClients.Write(arrayEmployees, 0, arrayEmployees.Length);
+                        fsClients.Close();
                     }
                 }
             }
             catch (MinorAgeException e)
             {
                 Console.WriteLine(e.Message);
-            }
-        }
-
-        private bool FileHasEmployee(string path, Employee employee)
-        {
-            int counter = 0;
-            using (FileStream fsEmployees = new FileStream($"{path}\\Employees.txt", FileMode.OpenOrCreate))
-            {
-                byte[] arrayReadEmployees = new byte[fsEmployees.Length];
-                fsEmployees.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
-                string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
-                string[] lines = employeesText.Split('\n');
-
-                foreach (var l in lines)
-                {
-                    string[] words = l.Split(' ');
-                    if (words[0] == employee.PassportID.ToString())
-                    {
-                        Console.WriteLine($"Error! Employee with passportID={words[0]} exists!");
-                        counter++;
-                    }
-                }
-                if (counter > 0)
-                    return true;
-                else
-                    return false;
             }
         }
 
@@ -239,15 +184,12 @@ namespace BankSystem.Services
                     fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
                     string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
 
-                    string[] clientsFromFile = clientsText.Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string cl in clientsFromFile)
+                    List<Client> clients=JsonConvert.DeserializeObject<List<Client>>(clientsText);
+
+                    foreach (var client in clients)
                     {
-                        if (cl != "")
-                        {
-                            Client client = JsonConvert.DeserializeObject<Client>(cl);
-                            if (client.PassportID == passportID)
-                                return client;
-                        }
+                        if (client.PassportID == passportID)
+                            return client;
                     }
                 }
             return null;
@@ -270,15 +212,12 @@ namespace BankSystem.Services
                     fsEmployees.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
                     string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
 
-                    string[] employeeFromFile = employeesText.Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string emp in employeeFromFile)
+                    List<Employee> employees = JsonConvert.DeserializeObject<List<Employee>>(employeesText);
+
+                    foreach (var employee in employees)
                     {
-                        if (emp != "")
-                        {
-                            Employee employee = JsonConvert.DeserializeObject<Employee>(emp);
-                            if (employee.PassportID == passportID)
-                                return employee;
-                        }
+                        if (employee.PassportID == passportID)
+                            return employee;
                     }
                 }
             }
@@ -296,8 +235,6 @@ namespace BankSystem.Services
                 directoryInfo.Create();
             }
 
-            AppendToDictionaryFromFile(pathDictionary);
-
             if (!Clients.Contains(client))
                 AddClient(client);
 
@@ -311,25 +248,6 @@ namespace BankSystem.Services
             }
 
             RewriteDictionary(pathDictionary);
-        }
-
-        //ДОПИСЫВАЕТ (!не перезаписывает) данные из файла в словарь
-        private void AppendToDictionaryFromFile(string pathDictionary)
-        {
-            using (FileStream fsClientAccounts = new FileStream($"{ pathDictionary}\\ClientAccounts.txt", FileMode.OpenOrCreate))
-            {
-                byte[] arrayClientAccounts = new byte[fsClientAccounts.Length];
-                fsClientAccounts.Read(arrayClientAccounts, 0, arrayClientAccounts.Length);
-                string clientAccountsText = System.Text.Encoding.Default.GetString(arrayClientAccounts);
-
-                var dictionary = JsonConvert.DeserializeObject<Dictionary<int, List<Account>>>(clientAccountsText);
-                if(!(dictionary is null))
-                    foreach (var dict in dictionary)
-                    {
-                        if (!_clientAccounts.ContainsKey(dict.Key))
-                            _clientAccounts.Add(dict.Key, dict.Value);
-                    }
-            }
         }
 
         private void RewriteDictionary(string pathDictionary)

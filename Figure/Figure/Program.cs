@@ -59,12 +59,8 @@ namespace Figure
         {
             Console.WriteLine("\nJson Serialization | Figures\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
+            CheckDirectory(path);
 
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
             string result = "";
             using (FileStream fs = new FileStream($"{path}\\figuresSerJson.txt", FileMode.OpenOrCreate))
             {
@@ -82,12 +78,7 @@ namespace Figure
             Console.WriteLine("\nJson Deserialization | Figures\n");
 
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             List<Figure> deserJson = new List<Figure>();
 
@@ -110,12 +101,7 @@ namespace Figure
         {
             Console.WriteLine("\nXml Serialization | Figures\n");
             string path= Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             XmlSerializer formatter = new XmlSerializer(typeof(List<Figure>));
             using (FileStream fs = new FileStream($"{path}\\figures.xml", FileMode.OpenOrCreate))
@@ -129,12 +115,7 @@ namespace Figure
         {
             Console.WriteLine("\nXml Deserialization | Figures\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             List<Figure> deserXml;
             XmlSerializer formatter = new XmlSerializer(typeof(List<Figure>));
@@ -153,12 +134,7 @@ namespace Figure
         {
             Console.WriteLine("\nBinary Serialization | Figures\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream fs = new FileStream($"{path}\\figures.dat", FileMode.OpenOrCreate))
@@ -171,12 +147,7 @@ namespace Figure
         {
             Console.WriteLine("\nBinary Deserialization | Figures\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             List<Figure> deserBinary;
 
@@ -196,12 +167,8 @@ namespace Figure
         {
             Console.WriteLine("\nJson Serialization | Boxes\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
+            CheckDirectory(path);
 
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
             string result = "";
             using (FileStream fs = new FileStream($"{path}\\boxSerJson.txt", FileMode.OpenOrCreate))
             {
@@ -219,12 +186,7 @@ namespace Figure
             Console.WriteLine("\nJson Deserialization | Boxes\n");
 
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             List<Box> deserJson = new List<Box>();
 
@@ -267,12 +229,7 @@ namespace Figure
         {
             Console.WriteLine("\nXml Deserialization | Boxes\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             List<Box> deserXml;
             XmlSerializer formatter = new XmlSerializer(typeof(List<Box>));
@@ -292,13 +249,8 @@ namespace Figure
         public static void BoxSerBinary(List<Box> boxes)
         {
             Console.WriteLine("\nBinary Serialization | Boxes\n");
-            string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            string path = Directory.GetCurrentDirectory() + "\\Serialization";            
+            CheckDirectory(path);
 
             BinaryFormatter formatter = new BinaryFormatter();
             using (FileStream fs = new FileStream($"{path}\\boxes.dat", FileMode.OpenOrCreate))
@@ -311,12 +263,7 @@ namespace Figure
         {
             Console.WriteLine("\nBinary Deserialization | Boxes\n");
             string path = Directory.GetCurrentDirectory() + "\\Serialization";
-            DirectoryInfo directoryInfo = new DirectoryInfo(path);
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
+            CheckDirectory(path);
 
             List<Box> deserBinary;
 
@@ -331,6 +278,16 @@ namespace Figure
                 Console.WriteLine($"Owner={box.Owner}");
                 foreach (var b in box.Figures)
                     Console.WriteLine($"SideCount={b.SideCount}, SideLength={b.SideLength}");
+            }
+        }
+
+        public static void CheckDirectory(string path)
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(path);
+
+            if (!directoryInfo.Exists)
+            {
+                directoryInfo.Create();
             }
         }
     }
