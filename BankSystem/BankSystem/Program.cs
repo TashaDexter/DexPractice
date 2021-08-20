@@ -99,18 +99,27 @@ namespace BankSystem
             bankService1.AddClientAccount(client2, acc1);
             */
 
-            Assembly asm = Assembly.LoadFrom("D:\\Dex\\DexPractice\\DexPractice\\Figure\\Figure\\bin\\Debug\\Figure.exe");
+            //подключаем сборку используя относительный путь
+            Assembly asm = Assembly.LoadFrom(Directory.GetCurrentDirectory()+"\\..\\..\\..\\..\\Figure\\Figure\\bin\\Debug\\Figure.exe");
             Console.WriteLine(asm.FullName);
 
             Type myType = asm.GetType("Figure.Box", false, true);
             DataExportService dataExportService1 = new DataExportService();
+            //создать экзмепляр класса myType=Figure.Box
             object obj = Activator.CreateInstance(myType);
-            MethodInfo method = myType.GetMethod("Display");
+
+            //вызвать метод DisplayFigure, который получает строковое сообщение и выводит на экран
+            MethodInfo method = myType.GetMethod("DisplayFigure");
             // вызываем метод, передаем ему значения для параметров и получаем результат
-            method.Invoke(obj, new object[] { "тест"});
-            //var obj=GenerateNewObject("Figure.Box, Figure");
+            method.Invoke(obj, new object[] { "test message"});
 
-
+            var nonPublicProperties = myType.GetProperties();
+            foreach (var nonPubProp in nonPublicProperties)
+            {
+                Console.WriteLine(nonPubProp);
+            }
+            
+            
 
             //проверка money transfer
             /*
@@ -131,27 +140,6 @@ namespace BankSystem
             Console.WriteLine($"Account2 ammount={acc2.Ammount}");*/
 
             Console.ReadKey();
-        }
-
-        private static object GenerateNewObject(string type)
-        {
-            var myType = Type.GetType(type, false, true);
-            DataExportService dataExportService1 = new DataExportService();
-            if (myType != null)
-            {
-                //получаем конструктор
-                System.Reflection.ConstructorInfo ctor= myType.GetConstructor(new Type[] { });
-
-                //вызываем конструтор
-                object Obj = ctor.Invoke(new object[] { });
-                dataExportService1.Display(Obj);
-                return Obj;
-            }
-            else
-            {
-                Console.WriteLine("Класс не найден");
-                return null;
-            }
         }
     }
 }

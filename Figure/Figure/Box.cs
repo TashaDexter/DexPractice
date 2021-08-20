@@ -13,7 +13,12 @@ namespace Figure
     {
         private List<Figure> _figures;
         public string Owner { get; set; }
-        public Box() { _figures = new List<Figure>(); }
+        public Box()
+        {
+            _figures = new List<Figure>();
+            Owner = "NoName";
+            Name = Owner + " Box";
+        }
 
         public void AddFigure(Figure figure)
         {
@@ -27,10 +32,10 @@ namespace Figure
             set { _figures = value; }
         }
 
+        private string Name { get; set; }
         public void DisplayFigure(string message)
         {
             Console.WriteLine(message);
         }
-        
     }
 }
