@@ -14,7 +14,7 @@ namespace BankSystem.Services
         {
             var client = new Faker<Client>()
                .StrictMode(true)
-                .RuleFor(x => x.PassportID, f => f.Random.Int(1000, 9999))
+                .RuleFor(x => x.PassportID, f => f.Random.String2(2).ToUpper()+f.Random.Int(1000, 9999).ToString())
                 .RuleFor(x => x.FirstName, f => f.Name.FirstName())
                 .RuleFor(x => x.LastName, f => f.Name.LastName())
                 .RuleFor(x => x.Age, f => f.Random.Int(19, 50));
@@ -24,7 +24,7 @@ namespace BankSystem.Services
         {
             var employee = new Faker<Employee>()
                .StrictMode(true)
-                .RuleFor(x => x.PassportID, f => f.Random.Int(1000, 9999))
+                .RuleFor(x => x.PassportID, f => f.Random.String2(2).ToUpper()+ f.Random.Int(1000, 9999).ToString())
                 .RuleFor(x => x.FirstName, f => f.Name.FirstName())
                 .RuleFor(x => x.LastName, f => f.Name.LastName())
                 .RuleFor(x => x.Age, f => f.Random.Int(19, 50));

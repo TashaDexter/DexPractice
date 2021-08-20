@@ -2,7 +2,7 @@
 {
     public class Client : IPerson
     {
-        public int PassportID { get; set; }
+        public string PassportID { get; set; }
 
         public string FirstName { get; set; }
 
@@ -33,7 +33,7 @@
 
         public override int GetHashCode()
         {
-            return PassportID;
+            return PassportID.GetHashCode();
         }
 
     }

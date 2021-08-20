@@ -12,13 +12,13 @@ namespace BankSystem.Services
     {
         private List<Client> _clients;
         private List<Employee> _employees;
-        private Dictionary<int, List<Account>> _clientAccounts;
+        private Dictionary<string, List<Account>> _clientAccounts;
         public Func<Currency, Currency, double, double> ExchangeHandler;
         public BankService()
         {
-            Clients=new List<Client>();
-            Employees = new List<Employee>();
-            _clientAccounts = new Dictionary<int, List<Account>>();
+            GetClientsFromFile();
+            GetEmployeesFromFile();
+            GetClientAccountsFromFile();
         }
         public List<Client> Clients
         {
@@ -129,7 +129,7 @@ namespace BankSystem.Services
             }
         }
 
-        public IPerson Find<T>(int passportID) where T : IPerson
+        public IPerson Find<T>(string passportID) where T : IPerson
         {
             //поиск из файла
             return FindFromFile<T>(passportID);
@@ -144,7 +144,7 @@ namespace BankSystem.Services
             return null;
         }
 
-        private IPerson FindPerson<U>(List<U> list, int passportID) where U : IPerson
+        private IPerson FindPerson<U>(List<U> list, string passportID) where U : IPerson
         {
             IEnumerable<IPerson> query = (IEnumerable<IPerson>)(from l in list
                                                                 where l.PassportID == passportID
@@ -157,7 +157,7 @@ namespace BankSystem.Services
             return null;
         }
 
-        private IPerson FindFromFile<T>(int passportID) where T : IPerson
+        private IPerson FindFromFile<T>(string passportID) where T : IPerson
         {
             var client = FindClientFromFile(passportID);
             var employee = FindEmployeeFromFile(passportID);
@@ -168,7 +168,7 @@ namespace BankSystem.Services
             return null;
         }
 
-        private Client FindClientFromFile(int passportID)
+        private Client FindClientFromFile(string passportID)
         {
             string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
             DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
@@ -195,7 +195,7 @@ namespace BankSystem.Services
             return null;
         }
 
-        private Employee FindEmployeeFromFile(int passportID)
+        private Employee FindEmployeeFromFile(string passportID)
         {
             string pathEmployees = Directory.GetCurrentDirectory() + "\\Employees";
             DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployees);
@@ -237,7 +237,7 @@ namespace BankSystem.Services
 
             if (!Clients.Contains(client))
                 AddClient(client);
-
+            
             if (!_clientAccounts.ContainsKey(client.PassportID))
             {
                 _clientAccounts.Add(client.PassportID, new List<Account> { account });
@@ -258,6 +258,61 @@ namespace BankSystem.Services
                 byte[] arrayText = System.Text.Encoding.Default.GetBytes(textClientAccount);
                 fsClientAccounts.Write(arrayText, 0, arrayText.Length);
             }
+        }
+
+        private void GetClientsFromFile()
+        {
+            string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
+            DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
+
+            if (directoryInfo.Exists)
+                using (FileStream fsClients = new FileStream($"{pathClients}\\Clients.txt", FileMode.OpenOrCreate))
+                {
+                    byte[] arrayReadClients = new byte[fsClients.Length];
+                    fsClients.Read(arrayReadClients, 0, arrayReadClients.Length);
+                    string clientsText = System.Text.Encoding.Default.GetString(arrayReadClients);
+
+                    Clients = JsonConvert.DeserializeObject<List<Client>>(clientsText);
+                }
+            else
+                Clients = new List<Client>();
+        }
+
+        private void GetEmployeesFromFile()
+        {
+            string pathEmployees = Directory.GetCurrentDirectory() + "\\Employees";
+            DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployees);
+
+            if (directoryInfo.Exists)
+                using (FileStream fsEmployees = new FileStream($"{pathEmployees}\\Employees.txt", FileMode.OpenOrCreate))
+                {
+                    byte[] arrayReadEmployees = new byte[fsEmployees.Length];
+                    fsEmployees.Read(arrayReadEmployees, 0, arrayReadEmployees.Length);
+                    string employeesText = System.Text.Encoding.Default.GetString(arrayReadEmployees);
+                    Employees = JsonConvert.DeserializeObject<List<Employee>>(employeesText);
+                }
+            else
+                Employees = new List<Employee>();
+        }
+
+        private void GetClientAccountsFromFile()
+        {
+            string pathClientAccounts = Directory.GetCurrentDirectory() + "\\ClientAccounts";
+            DirectoryInfo directoryInfo = new DirectoryInfo(pathClientAccounts);
+
+            if (directoryInfo.Exists)
+                using (FileStream fsClientAccounts = new FileStream($"{pathClientAccounts}\\ClientAccounts.txt", FileMode.OpenOrCreate))
+                {
+                    byte[] arrayReadClientAccounts = new byte[fsClientAccounts.Length];
+                    fsClientAccounts.Read(arrayReadClientAccounts, 0, arrayReadClientAccounts.Length);
+                    string clientAccountsText = System.Text.Encoding.Default.GetString(arrayReadClientAccounts);
+                    if (clientAccountsText=="")
+                        _clientAccounts = new Dictionary<string, List<Account>>();
+                    else
+                        _clientAccounts = JsonConvert.DeserializeObject<Dictionary<string, List<Account>>>(clientAccountsText);
+                }
+            else
+                _clientAccounts = new Dictionary<string, List<Account>>();
         }
 
         public void MoneyTransfer(double ammount, Account donorAccount, Account recipientAccount, Func<double, Currency, Currency, double> exchangeHandler)

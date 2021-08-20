@@ -8,7 +8,7 @@ namespace BankSystem.Models
 {
     public interface IPerson
     {
-        int PassportID { get; set; }
+        string PassportID { get; set; }
 
         string FirstName { get; set; }
 

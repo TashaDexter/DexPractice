@@ -15,6 +15,7 @@ namespace BankSystem
             var generator = new FakeDataService();
 
             //тестовое добавление клиентов
+            /*
             Console.WriteLine("\nHow many clients do you want to add?");
             int clientNumber = Convert.ToInt32(Console.ReadLine());
             int number = 0;
@@ -32,9 +33,10 @@ namespace BankSystem
                     $"FirstName={client.FirstName}, " +
                     $"LastName={client.LastName}, " +
                     $"Age={client.Age}");
-            }
+            }*/
 
             //тестовое добавление сотрудников
+            /*
             Console.WriteLine("\nHow many employees do you want to add?");
             int employeeNumber = Convert.ToInt32(Console.ReadLine());
             number = 0;
@@ -51,11 +53,12 @@ namespace BankSystem
                     $"FirstName={employee.FirstName}, " +
                     $"LastName={employee.LastName}, " +
                     $"Age={employee.Age}");
-            }
+            }*/
 
-            //проверка поиска            
+            //проверка поиска
+            /*
             Console.WriteLine("\nEnter PassportID to search:");
-            int passportID = Convert.ToInt32(Console.ReadLine());
+            string passportID = Console.ReadLine();
 
             IPerson person=bankService1.Find<IPerson>(passportID);
             if (person != null)
@@ -70,9 +73,7 @@ namespace BankSystem
             else
             {
                 Console.WriteLine($"Person with passportID={passportID} was not found.");
-            }
-            
-            Console.WriteLine("\n----------------------------------------------");
+            }*/
 
             //проверка добавления в словарь
             Ruble ruble = new Ruble() { Type="RUB",ValueInDollars = 0.014 };
@@ -89,10 +90,17 @@ namespace BankSystem
             Account acc3 = new Account() { Currency = ruble, Ammount = 1578 };
             Account acc4 = new Account() { Currency = euro, Ammount = 4824 };
                         
+            /*
             bankService1.AddClientAccount(client1, acc1);
             bankService1.AddClientAccount(client1, acc2);
             bankService1.AddClientAccount(client2, acc3);
             bankService1.AddClientAccount(client2, acc1);
+            */
+
+            DataExportService dataExportService1 = new DataExportService();
+            dataExportService1.Display(client1);
+            Console.WriteLine();
+            dataExportService1.Display(acc3);
 
             //проверка money transfer
             /*
