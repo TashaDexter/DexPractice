@@ -26,6 +26,11 @@ namespace Figure
             get { return _figures; }
             set { _figures = value; }
         }
+
+        public void DisplayFigure(string message)
+        {
+            Console.WriteLine(message);
+        }
         
     }
 }

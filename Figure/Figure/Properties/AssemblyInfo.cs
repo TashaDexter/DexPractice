@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 // Установка значения False для параметра ComVisible делает типы в этой сборке невидимыми
 // для компонентов COM. Если необходимо обратиться к типу в этой сборке через
 // из модели COM задайте для атрибута ComVisible этого типа значение true.
-[assembly: ComVisible(false)]
+[assembly: ComVisible(true)]
 
 // Следующий GUID представляет идентификатор typelib, если этот проект доступен из модели COM
 [assembly: Guid("dcf4ff0f-d49e-440e-8759-f635a825126a")]
