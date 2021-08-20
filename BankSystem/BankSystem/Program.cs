@@ -101,25 +101,42 @@ namespace BankSystem
 
             //подключаем сборку используя относительный путь
             Assembly asm = Assembly.LoadFrom(Directory.GetCurrentDirectory()+"\\..\\..\\..\\..\\Figure\\Figure\\bin\\Debug\\Figure.exe");
-            Console.WriteLine(asm.FullName);
+            Console.WriteLine($"Assembly fullname: {asm.FullName}");
 
-            Type myType = asm.GetType("Figure.Box", false, true);
+            Type myType = asm.GetType("Figure.Figure", false, true);
             DataExportService dataExportService1 = new DataExportService();
+            
+            Console.WriteLine("\nCreating an instance of the Figure class: ");
             //создать экзмепляр класса myType=Figure.Box
             object obj = Activator.CreateInstance(myType);
 
-            //вызвать метод DisplayFigure, который получает строковое сообщение и выводит на экран
-            MethodInfo method = myType.GetMethod("DisplayFigure");
-            // вызываем метод, передаем ему значения для параметров и получаем результат
-            method.Invoke(obj, new object[] { "test message"});
-
-            var nonPublicProperties = myType.GetProperties();
-            foreach (var nonPubProp in nonPublicProperties)
+            var properties = myType.GetProperties();
+            foreach (var prop in properties)
             {
-                Console.WriteLine(nonPubProp);
+                Console.Write($"SetValue: {prop.Name} = ");
+                prop.SetValue(obj, Convert.ToInt32(Console.ReadLine()));
             }
+
+            Console.WriteLine("\nDataExportService.Display:");
+            dataExportService1.Display(obj);
+
+            Console.WriteLine("\nFigure private properties:");
+            var privateProperties = myType.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            foreach (var privateProp in privateProperties)
+            {
+                Console.WriteLine($"{privateProp.Name} = {privateProp.GetValue(obj)}");
+            }
+
+            //вызвать метод CalculateSquare            
+            MethodInfo method = myType.GetMethod("CalculateSquare");
+            Console.WriteLine("\nFigure.CalculateSquare:");
+            Console.Write("SideCount = ");
+            int sideCount = Convert.ToInt32(Console.ReadLine());
+            Console.Write("SideLength = ");
+            int sideLength = Convert.ToInt32(Console.ReadLine());
             
-            
+            // вызываем метод, передаем ему значения для параметров и получаем результат
+            method.Invoke(obj, new object[] {sideCount, sideLength});
 
             //проверка money transfer
             /*

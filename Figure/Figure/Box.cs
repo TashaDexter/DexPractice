@@ -16,8 +16,6 @@ namespace Figure
         public Box()
         {
             _figures = new List<Figure>();
-            Owner = "NoName";
-            Name = Owner + " Box";
         }
 
         public void AddFigure(Figure figure)
@@ -30,12 +28,6 @@ namespace Figure
         {
             get { return _figures; }
             set { _figures = value; }
-        }
-
-        private string Name { get; set; }
-        public void DisplayFigure(string message)
-        {
-            Console.WriteLine(message);
         }
     }
 }

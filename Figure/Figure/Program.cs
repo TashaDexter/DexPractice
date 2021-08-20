@@ -33,7 +33,6 @@ namespace Figure
             FiguresSerBinary(box.Figures);
             FiguresDeserBinary();
 
-            /*
             Console.WriteLine("---------------------------");
             Console.WriteLine("How many boxes do you want to add?");
             int boxesNumber = Convert.ToInt32(Console.ReadLine());
@@ -50,7 +49,7 @@ namespace Figure
             BoxDeserXml();
 
             BoxSerBinary(boxes);
-            BoxesDeserBinary();*/
+            BoxesDeserBinary();
 
 
             Console.Read();
