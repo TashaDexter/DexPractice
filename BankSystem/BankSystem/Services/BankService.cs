@@ -20,7 +20,7 @@ namespace BankSystem.Services
             GetEmployeesFromFile();
             GetClientAccountsFromFile();
         }
-        public List<Client> Clients
+        private List<Client> Clients
         {
             get
             {
@@ -32,7 +32,7 @@ namespace BankSystem.Services
             }
         }
 
-        public List<Employee> Employees
+        private List<Employee> Employees
         {
             get
             {
@@ -46,87 +46,71 @@ namespace BankSystem.Services
 
         public void Add<T>(T person) where T : IPerson
         {
-            if (person is Client)
+            try
             {
-                var client = person as Client;
-                AddClient(client);
-            }
+                if (person.Age < 18)
+                    throw new MinorAgeException("Error! Attempting to add a minor age person.");
+                else
+                {
+                    if (person is Client)
+                    {
+                        var client = person as Client;
+                        AddClient(client);
+                    }
 
-            if (person is Employee)
+                    if (person is Employee)
+                    {
+                        var employee = person as Employee;
+                        AddEmployee(employee);
+                    }
+                }
+            }
+            catch (MinorAgeException e)
             {
-                var employee = person as Employee;
-                AddEmployee(employee);
+                Console.WriteLine(e.Message);
             }
         }
         private void AddClient(Client client)
         {
-            try
+            _clients.Add(client);
+            
+            //создание пути в bin/Debug/Clients
+            string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
+            DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
+            
+            if (!directoryInfo.Exists)
             {
-                if (client.Age < 18)
-                    throw new MinorAgeException("Error! Attempting to add a minor age person.");
-                else
-
-                {
-                    _clients.Add(client);
-
-                    //создание пути в bin/Debug/Clients/
-                    string pathClients = Directory.GetCurrentDirectory() + "\\Clients";
-                    DirectoryInfo directoryInfo = new DirectoryInfo(pathClients);
-
-                    if (!directoryInfo.Exists)
-                    {
-                        directoryInfo.Create();
-                    }
-
-                    var serClients = JsonConvert.SerializeObject(_clients);
-
-                    using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.Create))
-                    {
-                        byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClients);
-                        fsClients.Write(arrayClients, 0, arrayClients.Length);
-                        fsClients.Close();
-                    }
-                }
+                directoryInfo.Create();
             }
-            catch (MinorAgeException e)
+            var serClients = JsonConvert.SerializeObject(_clients);
+            using (FileStream fsClients = new FileStream($"{ pathClients}\\Clients.txt", FileMode.Create))
             {
-                Console.WriteLine(e.Message);
-            }
+                byte[] arrayClients = System.Text.Encoding.Default.GetBytes(serClients);
+                fsClients.Write(arrayClients, 0, arrayClients.Length);
+                fsClients.Close();
+            }           
         }
 
         private void AddEmployee(Employee employee)
         {
-            try
+            _employees.Add(employee);
+            
+            //создание пути в bin/Debug/Employees
+            string pathEmployees = Directory.GetCurrentDirectory() + "\\Employees";
+            DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployees);
+            
+            if (!directoryInfo.Exists)
             {
-                if (employee.Age < 18)
-                    throw new MinorAgeException("Error! Attempting to add a minor age person.");
-                else
-                {
-                    _employees.Add(employee);
-
-                    //создание пути в bin/Debug/Employees
-                    string pathEmployees = Directory.GetCurrentDirectory() + "\\Employees";
-                    DirectoryInfo directoryInfo = new DirectoryInfo(pathEmployees);
-
-                    if (!directoryInfo.Exists)
-                    {
-                        directoryInfo.Create();
-                    }
-
-                    var serEmployees= JsonConvert.SerializeObject(_employees);
-
-                   using (FileStream fsClients = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.Create))
-                    {
-                        byte[] arrayEmployees = System.Text.Encoding.Default.GetBytes(serEmployees);
-                        fsClients.Write(arrayEmployees, 0, arrayEmployees.Length);
-                        fsClients.Close();
-                    }
-                }
+                directoryInfo.Create();
             }
-            catch (MinorAgeException e)
+            var serEmployees= JsonConvert.SerializeObject(_employees);
+            
+            using (FileStream fsClients = new FileStream($"{ pathEmployees}\\Employees.txt", FileMode.Create))
             {
-                Console.WriteLine(e.Message);
-            }
+                byte[] arrayEmployees = System.Text.Encoding.Default.GetBytes(serEmployees);
+                fsClients.Write(arrayEmployees, 0, arrayEmployees.Length);
+                fsClients.Close();
+            }                
         }
 
         public IPerson Find<T>(string passportID) where T : IPerson

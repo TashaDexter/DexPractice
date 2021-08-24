@@ -4,6 +4,7 @@ namespace BankSystem.Exceptions
 {
     public class MinorAgeException : Exception
     {
+        public MinorAgeException() { }
         public MinorAgeException(string message) : base(message)
         {
 
