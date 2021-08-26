@@ -9,32 +9,29 @@ namespace BankSystem.Tests
 {
     public class BankServiceTests
     {
-        public class AddClientTests
+        [Fact]
+        public void AddClient_ID_VS1548_FN_Jack_LN_Smith_Age_21()
         {
-            [Fact]
-            public void AddClient_ID_VS1548_FN_Jack_LN_Smith_Age_21()
-            {
-                BankService bankService = new BankService();
+            BankService bankService = new BankService();
 
-                Client client = new Client() { PassportID = "VS1548", FirstName = "Jack", LastName = "Smith", Age = 21 };
-                bankService.Add<Client>(client);
+            Client client = new Client() { PassportID = "VS1548", FirstName = "Jack", LastName = "Smith", Age = 21 };
+            bankService.Add<Client>(client);
 
-                var result = bankService.Find<Client>(client.PassportID);
+            var result = bankService.Find<Client>(client.PassportID);
 
-                Assert.Equal(client, result);
-            }
+            Assert.Equal(client, result);
+        }
 
-            [Fact]
-            public void AddClient_ID_VS1453_FN_Jenny_LN_Collin_Age_9_()
-            {
-                BankService bankService = new BankService();
-                Client client = new Client() { PassportID = "VS1453", FirstName = "Jenny", LastName = "Collin", Age = 9 };
+        [Fact]
+        public void AddClient_ID_VS1453_FN_Jenny_LN_Collin_Age_9_()
+        {
+            BankService bankService = new BankService();
+            Client client = new Client() { PassportID = "VS1453", FirstName = "Jenny", LastName = "Collin", Age = 9 };
 
-                bankService.Add<Client>(client);
-                var result = bankService.Find<Client>(client.PassportID);
+            bankService.Add<Client>(client);
+            var result = bankService.Find<Client>(client.PassportID);
 
-                Assert.Null(result);
-            }
+            Assert.Null(result);
         }
 
         [Fact]
