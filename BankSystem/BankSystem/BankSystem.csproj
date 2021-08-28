@@ -72,6 +72,8 @@
     <Compile Include="Exceptions\NotEnoughFundsException.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\Currency.cs" />
+    <Compile Include="Models\CurrencyListResponse.cs" />
+    <Compile Include="Models\CurrencyResponse.cs" />
     <Compile Include="Models\Dollar.cs" />
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Euro.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Services\DataExportService.cs" />
     <Compile Include="Services\FakeDataService.cs" />
     <Compile Include="Services\Exchange.cs" />
+    <Compile Include="Services\GetFromApiService.cs" />
     <Compile Include="Services\IExchange.cs" />
   </ItemGroup>
   <ItemGroup>

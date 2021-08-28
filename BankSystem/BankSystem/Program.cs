@@ -57,72 +57,18 @@ namespace BankSystem
                     $"Age={employee.Age}");
             }*/
 
-            //проверка поиска
-            /*
-            Console.WriteLine("\nEnter PassportID to search:");
-            string passportID = Console.ReadLine();
+            GetFromApiService getFromApiService = new GetFromApiService("ebdb8321776f5ae7487a39d9c368c544");
 
-            IPerson person=bankService1.Find<IPerson>(passportID);
-            if (person != null)
+            List<string> currencyList = getFromApiService.GetCurrencyList().Result.Data;
+
+            foreach (var currency in currencyList)
             {
-                Console.WriteLine($"\nPerson with passportID={passportID}:\n" +
-                      $"PassportID={person.PassportID}, " +
-                      $"FirstName={person.FirstName}, " +
-                      $"LastName={person.LastName}, " +
-                      $"Age={person.Age}, " +
-                      $"PersonType={ person.GetType()}");
+                var result = getFromApiService.GetCurrency(currency).Result.Data;
+                foreach (var res in result)
+                {
+                    Console.WriteLine($"{res.Key} : {res.Value}");
+                }
             }
-            else
-            {
-                Console.WriteLine($"Person with passportID={passportID} was not found.");
-            }*/
-
-            //проверка добавления в словарь
-            Ruble ruble = new Ruble() { Type="RUB",ValueInDollars = 0.014 };
-            Euro euro = new Euro() { Type="EUR", ValueInDollars = 1.19 };
-            Dollar dollar = new Dollar() { Type="USD", ValueInDollars = 1 };
-
-            Exchange exchange1 = new Exchange();
-
-            Client client1 = generator.GenerateClient();
-            Account acc1 = new Account() { Currency = ruble, Ammount = 278.5 };
-            Account acc2 = new Account() { Currency = dollar, Ammount = 29.8 };
-
-            Client client2 = generator.GenerateClient();
-            Account acc3 = new Account() { Currency = ruble, Ammount = 1578 };
-            Account acc4 = new Account() { Currency = euro, Ammount = 4824 };
-
-            /*
-            bankService1.AddClientAccount(client1, acc1);
-            bankService1.AddClientAccount(client1, acc2);
-            bankService1.AddClientAccount(client2, acc3);
-            bankService1.AddClientAccount(client2, acc1);
-            */
-
-            DataExportService dataExportService1 = new DataExportService();
-            
-            dataExportService1.ExportDataToFile(client1, "Clients.txt");
-            dataExportService1.ExportDataToFile(client2, "Clients.txt");
-
-            dataExportService1.ExportDataToFile(acc1, "Accounts.txt");
-
-            //проверка money transfer
-            /*
-            Console.WriteLine("\n-------------Before money transfer------------\n");
-            Console.WriteLine($"Account1 ammount={acc1.Ammount}");
-            Console.WriteLine($"Account2 ammount={acc2.Ammount}");
-
-            var exchHandler = new Func<double, Currency, Currency, double>(exchange1.ExchangeCurrency);
-
-            Console.WriteLine("\n---------------Money transfer #1---------------\n");
-            bankService1.MoneyTransfer(18, acc1, acc2, exchHandler);
-            Console.WriteLine($"Account1 ammount={acc1.Ammount}");
-            Console.WriteLine($"Account2 ammount={acc2.Ammount}");
-
-            Console.WriteLine("\n---------------Money transfer #2---------------\n");
-            bankService1.MoneyTransfer(270, acc1, acc2, exchHandler);
-            Console.WriteLine($"Account1 ammount={acc1.Ammount}");
-            Console.WriteLine($"Account2 ammount={acc2.Ammount}");*/
 
             Console.ReadKey();
         }
