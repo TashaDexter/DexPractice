@@ -86,7 +86,7 @@
     <Compile Include="Services\DataExportService.cs" />
     <Compile Include="Services\FakeDataService.cs" />
     <Compile Include="Services\Exchange.cs" />
-    <Compile Include="Services\GetFromApiService.cs" />
+    <Compile Include="Services\GetActualCurrencyService.cs" />
     <Compile Include="Services\IExchange.cs" />
   </ItemGroup>
   <ItemGroup>

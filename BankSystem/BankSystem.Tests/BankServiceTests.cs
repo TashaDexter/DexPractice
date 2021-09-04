@@ -4,6 +4,8 @@ using System.Text;
 using Xunit;
 using BankSystem.Models;
 using BankSystem.Services;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BankSystem.Tests
 {
@@ -66,6 +68,50 @@ namespace BankSystem.Tests
             Assert.Equal(client, result);
         }
 
+        //метод переписывает значение аккаунта из двух потоков одновременно
+        [Fact]
+        public void ChangeAmmountForClientAccount()
+        {            
+            var locker = new object();
+            BankService bankService = new BankService(locker);
 
+            Ruble ruble = new Ruble() { Type = "RUB", ValueInDollars = 0.014 };
+            Dollar dollar = new Dollar() { Type = "USD", ValueInDollars = 1 };
+
+            Account acc1 = new Account() { Ammount = 154, Currency = ruble };
+            Account acc2 = new Account() { Ammount = 169, Currency = dollar };
+
+            Exchange exchange = new Exchange();
+
+            var exchHandler = new Func<double, Currency, Currency, double>(exchange.ExchangeCurrency);
+
+            var completed = 0;
+
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                lock (locker)
+                {
+                    bankService.MoneyTransfer(13, acc1, acc2, exchHandler);
+                }
+                Thread.Sleep(500);
+                Interlocked.Increment(ref completed);
+            });
+
+            ThreadPool.QueueUserWorkItem(_ => 
+            {
+                lock (locker)
+                {
+                    bankService.MoneyTransfer(10, acc1, acc2, exchHandler);
+                }
+                Interlocked.Increment(ref completed);
+            });
+
+            while (completed < 2) // ожидание завершения
+            {
+            Thread.Sleep(25);
+            }
+
+            Assert.Equal(131, acc1.Ammount);
+        }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Threading;
 
 namespace BankSystem
 {
@@ -11,7 +12,8 @@ namespace BankSystem
     {
         static void Main(string[] args)
         {
-            BankService bankService1 = new BankService();
+            var locker = new object();
+            BankService bankService1 = new BankService(locker);
             Console.WriteLine("---------------BankService---------------");
 
             var generator = new FakeDataService();
@@ -57,18 +59,37 @@ namespace BankSystem
                     $"Age={employee.Age}");
             }*/
 
-            GetFromApiService getFromApiService = new GetFromApiService("ebdb8321776f5ae7487a39d9c368c544");
+            //Get from API - GetActualCurrencyService тест
+            //GetActualCurrencyService getActualCurrencyService = new GetActualCurrencyService("ebdb8321776f5ae7487a39d9c368c544");
 
-            List<string> currencyList = getFromApiService.GetCurrencyList().Result.Data;
+            //List<string> currencyList = getFromApiService.GetCurrencyList().Result.Data;
 
-            foreach (var currency in currencyList)
+            //foreach (var currency in currencyList)
+            //{
+            //    var result = getFromApiService.GetCurrency(currency).Result.Data;
+            //    foreach (var res in result)
+            //    {
+            //        Console.WriteLine($"{res.Key} : {res.Value}");
+            //    }
+            //}
+
+            bankService1.PrintClients();
+
+            ThreadPool.QueueUserWorkItem(_ =>
             {
-                var result = getFromApiService.GetCurrency(currency).Result.Data;
-                foreach (var res in result)
+                for (int i = 0; i < 100; i++)
                 {
-                    Console.WriteLine($"{res.Key} : {res.Value}");
+                    lock (locker)
+                    {
+                        Client client = generator.GenerateClient();
+                        bankService1.Add(client);
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Added client:{client.FirstName} {client.LastName}");
+                        Console.ResetColor();
+                    }
+                    Thread.Sleep(2000);
                 }
-            }
+            });
 
             Console.ReadKey();
         }

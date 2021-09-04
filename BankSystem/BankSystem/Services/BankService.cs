@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace BankSystem.Services
 {
@@ -14,8 +15,17 @@ namespace BankSystem.Services
         private List<Employee> _employees;
         private Dictionary<string, List<Account>> _clientAccounts;
         public Func<Currency, Currency, double, double> ExchangeHandler;
+        private object _locker;
         public BankService()
         {
+            GetClientsFromFile();
+            GetEmployeesFromFile();
+            GetClientAccountsFromFile();
+        }
+
+        public BankService(object locker)
+        {
+            _locker = locker;
             GetClientsFromFile();
             GetEmployeesFromFile();
             GetClientAccountsFromFile();
@@ -297,6 +307,24 @@ namespace BankSystem.Services
                 }
             else
                 _clientAccounts = new Dictionary<string, List<Account>>();
+        }
+
+        public void PrintClients()
+        {
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                while (true)
+                {
+                    lock (_locker)
+                    {
+                        foreach (var item in _clients)
+                        {
+                            Console.WriteLine($"{item.FirstName} {item.LastName}");
+                        }
+                    }
+                    Thread.Sleep(1000);
+                }
+            });
         }
 
         public void MoneyTransfer(double ammount, Account donorAccount, Account recipientAccount, Func<double, Currency, Currency, double> exchangeHandler)
